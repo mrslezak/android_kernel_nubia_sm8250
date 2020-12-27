@@ -2,7 +2,7 @@
 rm .version
 
 clear
-cd ~/RM5G_LOS/
+cd /home/user/RM5G_LOS/
 #cp Makefile.clang11 Makefile
 
 rm -rf out-clang
@@ -13,12 +13,12 @@ THREAD="-j8"
 KERNEL="Image"
 DTBIMAGE="dtb"
 
-export CLANG_PATH=~/toolchains/Clang-11/bin/
+export CLANG_PATH=/home/user/toolchains/Clang-11/bin/
 export PATH=${CLANG_PATH}:${PATH}
 export CLANG_TRIPLE=aarch64-linux-gnu-
-export CROSS_COMPILE=${HOME}/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-android- CC=clang CXX=clang++
-export CROSS_COMPILE_ARM32=${HOME}/toolchains/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
-export KBUILD_COMPILER_STRING=$(~/toolchains/Clang-11/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+export CROSS_COMPILE=/home/user/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-android- CC=clang CXX=clang++
+export CROSS_COMPILE_ARM32=/home/user/toolchains/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
+export KBUILD_COMPILER_STRING=$(/home/user/toolchains/Clang-11/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 export CXXFLAGS="$CXXFLAGS -fPIC"
 export DTC_EXT=dtc
 
@@ -27,13 +27,13 @@ DEFCONFIG="vendor/NX659J_defconfig"
 
 # Paths
 KERNEL_DIR=`pwd`
-ZIMAGE_DIR="~/RM5G_LOS/out-clang/arch/arm64/boot/"
+ZIMAGE_DIR="/home/user/RM5G_LOS/out-clang/arch/arm64/boot/"
 
 # Kernel Details
-VER="-1.0"
+VER="-1.2"
 
 # Vars
-BASE_AK_VER="RM5G_LOS"
+BASE_AK_VER="RM5G_LOS_RM5S"
 AK_VER="$BASE_AK_VER$VER"
 export LOCALVERSION=~`echo $AK_VER`
 export ARCH=arm64
@@ -67,15 +67,15 @@ cd $ZIMAGE_DIR
 ls -a
 
 # Make a dtb file
-cd ~/RM5G_LOS/out-clang/arch/arm64/boot/
-find ~/RM5G_LOS/out-clang/arch/arm64/boot/dts/vendor/qcom -name '*.dtb' -exec cat {} + > ~/RM5G_LOS/out-clang/arch/arm64/boot/dtb
+cd /home/user/RM5G_LOS/out-clang/arch/arm64/boot/
+find /home/user/RM5G_LOS/out-clang/arch/arm64/boot/dts/vendor/qcom -name '*.dtb' -exec cat {} + > /home/user/RM5G_LOS/out-clang/arch/arm64/boot/dtb
 ls -a
 
 # Put dtb and Image.gz in an AnyKernel3 zip archive and flash from TWRP
 AK_ZIP="$AK_VER.zip"
-cp dtb ~/AnyKernel3/
-cp Image.gz ~/AnyKernel3/
-cd ~/AnyKernel3/
+cp dtb /home/user/AnyKernel3/
+cp Image.gz /home/user/AnyKernel3/
+cd /home/user/AnyKernel3/
 zip -r9 ${AK_ZIP} .
 ls *.zip
-mv ${AK_ZIP} ~/
+mv ${AK_ZIP} /home/user/
