@@ -55,9 +55,14 @@
 /*********************ESD CHECK***********************/
 
 		qcom,disp-fod-dim-lut = <
-			/* brightness, alpha */
-			17	0xEB
-			32	0xE6
+			/* brightness, alpha */			
+			0	0xFF
+			4	0xEB
+			8	0xEA
+			12	0xE9
+			20	0xE8
+			28	0xE5
+			36	0xE6
 			48	0xE3
 			60	0xE0
 			136	0xD2
