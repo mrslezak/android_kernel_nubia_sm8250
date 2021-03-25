@@ -1,8 +1,14 @@
-// SPDX-License-Identifier: GPL-2.0-only
-/*
- * Copyright (c) 2010-2011, 2020, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
-
 #include <linux/of.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -22,7 +28,6 @@
 /* RTC_CTRL register bit fields */
 #define PM8xxx_RTC_ENABLE		BIT(7)
 #define PM8xxx_RTC_ALARM_CLEAR		BIT(0)
-#define PM8xxx_RTC_ALARM_ENABLE		BIT(7)
 
 #define NUM_8_BIT_RTC_REGS		0x4
 
@@ -298,14 +303,6 @@ static int pm8xxx_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alarm)
 		alarm->time.tm_sec, alarm->time.tm_mday,
 		alarm->time.tm_mon, alarm->time.tm_year);
 
-	rc = regmap_bulk_read(rtc_dd->regmap, regs->alarm_ctrl, value, 1);
-	if (rc) {
-		dev_err(dev, "Read from ALARM CTRL1 failed\n");
-		return rc;
-	}
-
-	alarm->enabled = !!(value[0] & PM8xxx_RTC_ALARM_ENABLE);
-
 	return 0;
 }
 
@@ -458,16 +455,6 @@ static const struct pm8xxx_rtc_regs pm8941_regs = {
 	.alarm_en	= BIT(7),
 };
 
-static const struct pm8xxx_rtc_regs pmk8350_regs = {
-	.ctrl		= 0x6146,
-	.write		= 0x6140,
-	.read		= 0x6148,
-	.alarm_rw	= 0x6240,
-	.alarm_ctrl	= 0x6246,
-	.alarm_ctrl2	= 0x6248,
-	.alarm_en	= BIT(7),
-};
-
 /*
  * Hardcoded RTC bases until IORESOURCE_REG mapping is figured out
  */
@@ -476,11 +463,18 @@ static const struct of_device_id pm8xxx_id_table[] = {
 	{ .compatible = "qcom,pm8018-rtc", .data = &pm8921_regs },
 	{ .compatible = "qcom,pm8058-rtc", .data = &pm8058_regs },
 	{ .compatible = "qcom,pm8941-rtc", .data = &pm8941_regs },
-	{ .compatible = "qcom,pmk8350-rtc", .data = &pmk8350_regs },
 	{ },
 };
 MODULE_DEVICE_TABLE(of, pm8xxx_id_table);
 
+//Begin [0016004715 add the kernel power code,20180316]
+#ifdef CONFIG_ZTEMT_POWER_DEBUG
+static time_t rtc_suspend_sec = 0;
+static time_t rtc_resume_sec = 0;
+static unsigned long all_sleep_time = 0;
+static unsigned long all_wake_time = 0;
+#endif
+//End [0016004715 add the kernel power code,20180316]
 static int pm8xxx_rtc_probe(struct platform_device *pdev)
 {
 	int rc;
@@ -551,21 +545,60 @@ static int pm8xxx_rtc_probe(struct platform_device *pdev)
 #ifdef CONFIG_PM_SLEEP
 static int pm8xxx_rtc_resume(struct device *dev)
 {
+        //Begin [0016004715 add the kernel power code,20180316]
+        #ifdef CONFIG_ZTEMT_POWER_DEBUG
+         int rc, diff=0;
+	struct rtc_time tm;
+	unsigned long now;
+        #endif
+       //End  [0016004715 add the kernel power code,20180316]
 	struct pm8xxx_rtc *rtc_dd = dev_get_drvdata(dev);
 
 	if (device_may_wakeup(dev))
 		disable_irq_wake(rtc_dd->rtc_alarm_irq);
-
+        //Begin [0016004715 add the kernel power code,20180316]
+        #ifdef CONFIG_ZTEMT_POWER_DEBUG
+	rc = pm8xxx_rtc_read_time(dev,&tm);
+        if (rc) {
+	  printk("%s: Unable to read from RTC\n", __func__);
+	}
+	rtc_tm_to_time(&tm, &now);
+	rtc_resume_sec = now;
+	diff = rtc_resume_sec - rtc_suspend_sec;
+	all_sleep_time += diff;
+	printk("I have sleep %d seconds all_sleep_time %lu seconds\n",diff,all_sleep_time);
+	#endif
+        //End   [0016004715 add the kernel power code,20180316]
 	return 0;
 }
 
 static int pm8xxx_rtc_suspend(struct device *dev)
 {
+	//Begin [0016004715 add the kernel power code,20180316]
+	#ifdef CONFIG_ZTEMT_POWER_DEBUG
+	int rc, diff=0;
+	struct rtc_time tm;
+	unsigned long now;
+	#endif
+	//End [0016004715 add the kernel power code,20180316]
 	struct pm8xxx_rtc *rtc_dd = dev_get_drvdata(dev);
 
 	if (device_may_wakeup(dev))
 		enable_irq_wake(rtc_dd->rtc_alarm_irq);
 
+         //Begin [0016004715 add the kernel power code,20180316]
+         #ifdef CONFIG_ZTEMT_POWER_DEBUG
+	rc = pm8xxx_rtc_read_time(dev,&tm);
+         if(rc) {
+	  printk("%s: Unable to read from RTC\n", __func__);
+	}
+	rtc_tm_to_time(&tm, &now);
+	rtc_suspend_sec = now;
+	diff = rtc_suspend_sec - rtc_resume_sec;
+	all_wake_time += diff;
+	printk("I have work %d seconds all_wake_time %lu seconds\n",diff,all_wake_time);
+	#endif
+	//End   [0016004715 add the kernel power code,20180316]
 	return 0;
 }
 #endif

@@ -102,6 +102,8 @@ static void fdatawait_one_bdev(struct block_device *bdev, void *arg)
 	filemap_fdatawait_keep_errors(bdev->bd_inode->i_mapping);
 }
 
+
+
 /*
  * Sync everything. We start by waking flusher threads so that most of
  * writeback runs on all devices in parallel. Then we sync all inodes reliably
@@ -170,6 +172,7 @@ SYSCALL_DEFINE1(syncfs, int, fd)
 	struct super_block *sb;
 	int ret;
 
+
 	if (!fsync_enabled)
 		return 0;
 
@@ -234,6 +237,7 @@ static int do_fsync(unsigned int fd, int datasync)
 {
 	struct fd f;
 	int ret = -EBADF;
+
 
 #ifdef CONFIG_ONEPLUS_HEALTHINFO
 	unsigned long oneplus_fsync_time = jiffies;
@@ -320,6 +324,8 @@ int ksys_sync_file_range(int fd, loff_t offset, loff_t nbytes,
 	struct address_space *mapping;
 	loff_t endbyte;			/* inclusive */
 	umode_t i_mode;
+
+
 
 	if (!fsync_enabled)
 		return 0;

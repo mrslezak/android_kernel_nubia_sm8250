@@ -9,6 +9,7 @@
 # of the License.
 
 include ../../scripts/Makefile.include
+CFLAGS += -Wall -Wstrict-prototypes -Wdeclaration-after-statement -O2 -s -D_LINUX -DDEFINE_ALTERNATE_TYPES -I$(KERNEL_INCLUDE)
 
 all: acpidbg acpidump ec
 clean: acpidbg_clean acpidump_clean ec_clean

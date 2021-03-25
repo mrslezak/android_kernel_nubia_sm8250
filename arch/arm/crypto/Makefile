@@ -19,6 +19,8 @@ ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
 ce-obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
 crc-obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
 
+ccflags-y := -O3
+
 ifneq ($(crc-obj-y)$(crc-obj-m),)
 ifeq ($(call as-instr,.arch armv8-a\n.arch_extension crc,y,n),y)
 ce-obj-y += $(crc-obj-y)

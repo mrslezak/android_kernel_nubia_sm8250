@@ -198,7 +198,7 @@ Examples:
 			     <0x0 0x8 0x5 IRQ_TYPE_EDGE_RISING>;
 		interrupt-names = "kpdpwr", "resin", "resin-bark",
 				  "kpdpwr-resin-bark";
-		qcom,pon-dbc-delay = <15625>;
+		qcom,pon-dbc-delay = <5625>;
 		qcom,system-reset;
 		qcom,s3-debounce = <32>;
 		qcom,s3-src = "resin";
