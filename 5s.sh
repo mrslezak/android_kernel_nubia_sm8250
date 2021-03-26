@@ -27,10 +27,10 @@ KERNEL_DIR=`pwd`
 ZIMAGE_DIR="out-clang/arch/arm64/boot/"
 
 # Kernel Details
-VER="-V-3"
+VER="-v3.2"
 
 # Vars
-BASE_AK_VER="ALI-RM5S"
+BASE_AK_VER="ALI_fandango-RM5S"
 AK_VER="$BASE_AK_VER$VER"
 export LOCALVERSION=~`echo $AK_VER`
 export ARCH=arm64
