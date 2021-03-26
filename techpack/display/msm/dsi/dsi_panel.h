@@ -114,7 +114,9 @@ struct dsi_backlight_config {
 	u32 bl_level;
 	u32 bl_scale;
 	u32 bl_scale_sv;
-
+#ifdef CONFIG_NUBIA_BACKLIGHT_CURVE
+        uint32_t backlight_curve[256];
+#endif
 	int en_gpio;
 	int lhbm_gpio;
 	/* PWM params */

@@ -102,3 +102,7 @@ config DRM_MSM_DSI_10NM_PHY
 	default y
 	help
 	  Choose this option if DSI PHY on SDM845 is used on the platform.
+
+config NUBIA_BACKLIGHT_CURVE
+        bool "nubia backlight function"
+        default n
